@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  outletsapi:
+    image: 'coconutsrule/outletsapi'
+    container_name: outletsapi
+    ports:
+      - 8080:8080
+    depends_on:
+      - outletsapi-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://outletsapi-db:5432/outletsapi_db
+      - SPRING_DATASOURCE_USERNAME=otoutlets
+      - SPRING_DATASOURCE_PASSWORD=passkey12345
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+  outletsapi-db:
+    image: 'library/postgres:13-alpine'
+    container_name: outletsapi-db
+    expose:
+      - 5432
+    volumes:
+      - outletsapi-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=otoutlets
+      - POSTGRES_PASSWORD=passkey12345
+      - POSTGRES_DB=outletsapi_db
+volumes:
+  outletsapi-db-data:

@@ -12,7 +12,7 @@ import org.geolatte.geom.Geometry;
  */
 @Data
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-public class Place {
+public class Place extends Auditable<User> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PLACE_ID_SEQ")
     @SequenceGenerator(name = "PLACE_ID_SEQ", sequenceName = "PLACE_ID_SEQ", allocationSize = 10)

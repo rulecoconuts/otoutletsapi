@@ -3,6 +3,7 @@ package com.coconutsrule.otoutlets.outletsapi.security;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import com.coconutsrule.otoutlets.outletsapi.dao.UserDao;
 import com.coconutsrule.otoutlets.outletsapi.models.User;
 import com.coconutsrule.otoutlets.outletsapi.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,11 @@ import org.springframework.stereotype.Service;
 @Service("CustomUserDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
-    UserRepo userRepo;
+    UserDao userDao;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepo.findByUsername(username);
+        return userDao.findByUsername(username);
     }
 
     private Collection<? extends GrantedAuthority> buildAuthorities(
