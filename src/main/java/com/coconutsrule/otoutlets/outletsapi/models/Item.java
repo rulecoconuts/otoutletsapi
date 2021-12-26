@@ -16,7 +16,7 @@ import lombok.Data;
  */
 @Data
 @Entity
-public class Item {
+public class Item extends Auditable<User> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_ID_SEQ")
     @SequenceGenerator(name = "ITEM_ID_SEQ", sequenceName = "ITEM_ID_SEQ", allocationSize = 10)

@@ -8,7 +8,8 @@ import java.util.List;
 public interface Dao<T, I> {
     T create(T entity);
     T update(T entity);
-    T find();
+    T find(T entity);
+    T findById(I id);
     List<T> findAll();
     void delete(T entity);
     void deleteById(I id);

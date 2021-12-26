@@ -13,6 +13,9 @@ services:
       - SPRING_DATASOURCE_USERNAME=otoutlets
       - SPRING_DATASOURCE_PASSWORD=passkey12345
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - JWTCONFIG_EXPIRATION_VALUE=2
+      - JWTCONFIG_EXPIRATION_UNIT=w
+      - JWTCONFIG_SECRET=+KdO8SLuxI2WA8tR7zelLuttzBLav/oqiFqtd5uGKbWDfK3JDaTAFdD/9EdWQ0knaaJ8KM8QgjLizfd2BKgM4Q==
   outletsapi-db:
     image: 'library/postgres:13-alpine'
     container_name: outletsapi-db

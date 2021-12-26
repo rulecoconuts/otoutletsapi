@@ -1,0 +1,46 @@
+package com.coconutsrule.otoutlets.outletsapi.security.jwt;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.Data;
+
+@Data
+@ConfigurationProperties(prefix = "jwtconfig")
+public class JwtConfig {
+    private String header = "Authorization";
+    private String tokenPrefix;
+    private Integer expirationValue;
+    private String expirationUnit;
+    private String secret;
+
+    /**
+     * Get expiration time of JWT in milliseconds
+     * 
+     * @return
+     */
+    public int getExpirationTimeInMilliseconds() {
+        int milliseconds = expirationValue;
+        String unit = expirationUnit.toLowerCase();
+
+        // Convert expiration value to milliseconds based on unit
+        switch (unit) {
+            case "y":
+                milliseconds *= 12;
+            case "m":
+                milliseconds *= 4;
+            case "w":
+                milliseconds *= 7;
+            case "d":
+                milliseconds *= 24;
+            case "h":
+                milliseconds *= 60;
+            case "min":
+                milliseconds *= 60;
+            case "s":
+                milliseconds *= 1000;
+            default:
+                break;
+        }
+
+        return milliseconds;
+    }
+}
