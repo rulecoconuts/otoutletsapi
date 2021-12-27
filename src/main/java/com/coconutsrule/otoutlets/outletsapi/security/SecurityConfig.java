@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -62,7 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .anyRequest().authenticated()
         .and()
         .addFilter(new JwtAuthenticationFilter(authenticationManager))
-        .addFilter(new JwtAuthorizationFilter(authenticationManager));
+        .addFilter(new JwtAuthorizationFilter(authenticationManager))
+        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     BasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint() {

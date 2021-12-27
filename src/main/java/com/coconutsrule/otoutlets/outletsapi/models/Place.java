@@ -11,6 +11,7 @@ import org.geolatte.geom.Geometry;
  * It is a parent table so that all place locations can be queried regardless of their specific type.
  */
 @Data
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 public class Place extends Auditable<User> {
     @Id

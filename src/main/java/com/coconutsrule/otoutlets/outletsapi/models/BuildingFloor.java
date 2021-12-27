@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
+@DiscriminatorValue("buildingfloor")
 public class BuildingFloor extends Place {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "building_id", nullable = false)
