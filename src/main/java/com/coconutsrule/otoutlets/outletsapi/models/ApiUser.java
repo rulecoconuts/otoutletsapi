@@ -30,10 +30,10 @@ public class ApiUser {
     String password;
     String salt;
 
-    boolean isAccountNonExpired;
-    boolean isAccountNonLocked;
-    boolean isCredentialsNonExpired;
-    boolean isEnabled;
+    boolean isAccountNonExpired = true;
+    boolean isAccountNonLocked = true;
+    boolean isCredentialsNonExpired = true;
+    boolean isEnabled = true;
 
     Role role;
 

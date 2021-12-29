@@ -14,7 +14,7 @@ import org.geolatte.geom.Geometry;
 @Inheritance
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("Place")
-public abstract class Place extends Auditable{
+public class Place extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PLACE_ID_SEQ")
     @SequenceGenerator(name = "PLACE_ID_SEQ", sequenceName = "PLACE_ID_SEQ", allocationSize = 10)

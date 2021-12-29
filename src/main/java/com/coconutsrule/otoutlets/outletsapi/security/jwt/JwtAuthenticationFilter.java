@@ -24,12 +24,19 @@ import lombok.RequiredArgsConstructor;
 /**
  * Authentication filter to handle JWT authentication
  */
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtConfig jwtConfig;
     private final UserDao userDao;
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtConfig jwtConfig, UserDao userDao){
+        this.authenticationManager = authenticationManager;
+        this.jwtConfig = jwtConfig;
+        this.userDao = userDao;
+
+        this.setFilterProcessesUrl("/login");
+    }
 
     /**
      * Attempt to authenticate the username and password by retreiving the username and creds
@@ -41,6 +48,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             ApiUser user = new ObjectMapper().readValue(request.getInputStream(), ApiUser.class);
             user = userDao.verify(user);
+            System.out.printf("Username: %s", user.getUsername());
 
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     user.getId(), user.getPassword(), new ArrayList<>()));

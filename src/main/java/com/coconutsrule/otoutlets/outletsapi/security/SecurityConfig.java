@@ -13,8 +13,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,6 +35,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.annotation.RequestScope;
 
 @Configuration
+@Order(1)
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -59,22 +62,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.httpBasic().authenticationEntryPoint(customBasicAuthenticationEntryPoint())
-        .and()
-        .authorizeRequests()
-        .regexMatchers("/register").permitAll()
-        .anyRequest().authenticated()
-        .and()
-        .addFilter(jwtAuthenticationFilter())
-        .addFilter(jwtAuthorizationFilter())
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        httpSecurity
+        .authorizeRequests().antMatchers(HttpMethod.POST, "/register", "/register**").anonymous()
+        .and().addFilter(jwtAuthorizationFilter())
+                .authorizeRequests().anyRequest().authenticated().and()
+                .addFilter(jwtAuthenticationFilter()).antMatcher("/login")
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
-    JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception{
+    JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         return new JwtAuthenticationFilter(authenticationManager(), jwtConfig, userDao);
     }
 
-    JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception{
+    JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
         return new JwtAuthorizationFilter(authenticationManager(), userDao, jwtConfig);
     }
 
@@ -88,17 +88,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean("auditorAwareRef")
-    public AuditorAware<com.coconutsrule.otoutlets.outletsapi.models.ApiUser> auditorAware(){
-        return new CustomAuditorAware();   
+    public AuditorAware<com.coconutsrule.otoutlets.outletsapi.models.ApiUser> auditorAware() {
+        return new CustomAuditorAware();
     }
 
     @Bean("dateTimeProviderRef")
-    public DateTimeProvider auditingDateTimeProvider(){
-        return ()->Optional.of(Instant.now());
+    public DateTimeProvider auditingDateTimeProvider() {
+        return () -> Optional.of(Instant.now());
     }
 
     @Bean
-    public PasswordStorage passwordStorage(){
+    public PasswordStorage passwordStorage() {
         return new PasswordStorage();
     }
 
