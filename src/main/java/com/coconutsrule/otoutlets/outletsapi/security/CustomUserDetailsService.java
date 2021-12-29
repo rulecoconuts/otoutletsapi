@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import com.coconutsrule.otoutlets.outletsapi.dao.UserDao;
-import com.coconutsrule.otoutlets.outletsapi.models.User;
+import com.coconutsrule.otoutlets.outletsapi.models.ApiUser;
+import com.coconutsrule.otoutlets.outletsapi.models.UserPermission;
 import com.coconutsrule.otoutlets.outletsapi.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,14 +22,20 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userDao.findByUsername(username);
+        ApiUser user = userDao.findByUsername(username);
+
+        UserDetails details = new org.springframework.security.core.userdetails.User(
+                user.getUsername(), user.getPassword(), buildAuthorities(user));
+
+        return details;
     }
 
-    private Collection<? extends GrantedAuthority> buildAuthorities(
-            Collection<? extends UserRole> roles) {
+    private Collection<? extends GrantedAuthority> buildAuthorities(ApiUser user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (UserRole role : roles)
-            authorities.add(new SimpleGrantedAuthority(role.toString()));
+        authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+        for (UserPermission permission : user.getPermissions())
+            authorities.add(new SimpleGrantedAuthority(
+                    permission.getPermissionId().getPermission().toString()));
         return authorities;
     }
 }

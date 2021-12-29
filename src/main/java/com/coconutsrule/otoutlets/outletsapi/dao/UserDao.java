@@ -2,7 +2,7 @@ package com.coconutsrule.otoutlets.outletsapi.dao;
 
 import java.util.List;
 import java.util.Random;
-import com.coconutsrule.otoutlets.outletsapi.models.User;
+import com.coconutsrule.otoutlets.outletsapi.models.ApiUser;
 import com.coconutsrule.otoutlets.outletsapi.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserDao implements Dao<User, Integer> {
+public class UserDao implements Dao<ApiUser, Integer> {
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -20,7 +20,7 @@ public class UserDao implements Dao<User, Integer> {
     UserRepo userRepo;
 
     @Override
-    public User create(User entity) {
+    public ApiUser create(ApiUser entity) {
         entity.setSalt(generateSalt());
         return userRepo.save(getUserWithHashedPassword(entity));
     }
@@ -49,9 +49,9 @@ public class UserDao implements Dao<User, Integer> {
      * @param user User with plaintext password
      * @return
      */
-    public User getUserWithHashedPassword(User user) {
+    public ApiUser getUserWithHashedPassword(ApiUser user) {
         String hash = passwordEncoder.encode(user.getPassword() + user.getSalt());
-        User encodedPasswordUser = new User();
+        ApiUser encodedPasswordUser = new ApiUser();
         encodedPasswordUser.setUsername(user.getUsername());
         encodedPasswordUser.setPassword(hash);
         return encodedPasswordUser;
@@ -63,12 +63,12 @@ public class UserDao implements Dao<User, Integer> {
      * @param user
      * @return User with hashed password
      */
-    public User verify(User user) {
-        User dbUser = findByUsername(user.getUsername());
+    public ApiUser verify(ApiUser user) {
+        ApiUser dbUser = findByUsername(user.getUsername());
         if (dbUser == null)
             throw new UsernameNotFoundException("Username does not exist");
         user.setSalt(dbUser.getSalt());
-        User hashedUser = getUserWithHashedPassword(user);
+        ApiUser hashedUser = getUserWithHashedPassword(user);
 
         if (!hashedUser.getPassword().equals(dbUser.getPassword()))
             throw new BadCredentialsException("Invalid password");
@@ -78,23 +78,23 @@ public class UserDao implements Dao<User, Integer> {
 
 
     @Override
-    public User update(User entity) {
+    public ApiUser update(ApiUser entity) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<User> findAll() {
+    public List<ApiUser> findAll() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public User findByUsername(String username) {
+    public ApiUser findByUsername(String username) {
         return userRepo.findByUsername(username);
     }
 
     @Override
-    public void delete(User entity) {
+    public void delete(ApiUser entity) {
         // TODO Auto-generated method stub
 
     }
@@ -106,13 +106,13 @@ public class UserDao implements Dao<User, Integer> {
     }
 
     @Override
-    public User find(User entity) {
+    public ApiUser find(ApiUser entity) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public User findById(Integer id) {
+    public ApiUser findById(Integer id) {
         // TODO Auto-generated method stub
         return null;
     }

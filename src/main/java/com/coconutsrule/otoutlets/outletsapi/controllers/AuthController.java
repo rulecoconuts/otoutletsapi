@@ -2,7 +2,7 @@ package com.coconutsrule.otoutlets.outletsapi.controllers;
 
 import java.net.URI;
 import com.coconutsrule.otoutlets.outletsapi.dao.UserDao;
-import com.coconutsrule.otoutlets.outletsapi.models.User;
+import com.coconutsrule.otoutlets.outletsapi.models.ApiUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +14,7 @@ public class AuthController {
     UserDao userDao;
 
     @PostMapping("/register")
-    public ResponseEntity register(User user){
+    public ResponseEntity register(ApiUser user){
         userDao.create(user);
         return ResponseEntity.ok().build();
     }

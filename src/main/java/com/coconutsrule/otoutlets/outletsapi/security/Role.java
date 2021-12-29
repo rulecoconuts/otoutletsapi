@@ -1,6 +1,6 @@
 package com.coconutsrule.otoutlets.outletsapi.security;
 
-public enum UserRole {
+public enum Role {
     USER,
     ADMIN
 }

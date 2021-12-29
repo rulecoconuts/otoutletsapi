@@ -11,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContext;
@@ -26,8 +29,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.annotation.RequestScope;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -39,9 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     JwtConfig jwtConfig;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
 
     @Autowired
     UserDetailsManager users(DataSource dataSource) {
@@ -62,9 +65,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .regexMatchers("/register").permitAll()
         .anyRequest().authenticated()
         .and()
-        .addFilter(new JwtAuthenticationFilter(authenticationManager))
-        .addFilter(new JwtAuthorizationFilter(authenticationManager))
+        .addFilter(jwtAuthenticationFilter())
+        .addFilter(jwtAuthorizationFilter())
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    }
+
+    JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception{
+        return new JwtAuthenticationFilter(authenticationManager(), jwtConfig, userDao);
+    }
+
+    JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception{
+        return new JwtAuthorizationFilter(authenticationManager(), userDao, jwtConfig);
     }
 
     BasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint() {
@@ -77,12 +88,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean("auditorAwareRef")
-    public AuditorAware<com.coconutsrule.otoutlets.outletsapi.models.User> auditorAware(SecurityContext context){
-        return new CustomAuditorAware(context);   
+    public AuditorAware<com.coconutsrule.otoutlets.outletsapi.models.ApiUser> auditorAware(){
+        return new CustomAuditorAware();   
     }
 
     @Bean("dateTimeProviderRef")
     public DateTimeProvider auditingDateTimeProvider(){
         return ()->Optional.of(Instant.now());
+    }
+
+    @Bean
+    public PasswordStorage passwordStorage(){
+        return new PasswordStorage();
+    }
+
+    @Bean
+    @Override
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
     }
 }

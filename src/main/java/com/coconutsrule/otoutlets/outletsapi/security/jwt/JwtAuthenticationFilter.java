@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.coconutsrule.otoutlets.outletsapi.dao.UserDao;
-import com.coconutsrule.otoutlets.outletsapi.models.User;
+import com.coconutsrule.otoutlets.outletsapi.models.ApiUser;
+import com.coconutsrule.otoutlets.outletsapi.security.PasswordStorage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
-    private JwtConfig jwtConfig;
-    private UserDao userDao;
+    private final JwtConfig jwtConfig;
+    private final UserDao userDao;
 
     /**
      * Attempt to authenticate the username and password by retreiving the username and creds
@@ -38,11 +39,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request,
             HttpServletResponse response) throws AuthenticationException {
         try {
-            User user = new ObjectMapper().readValue(request.getInputStream(), User.class);
+            ApiUser user = new ObjectMapper().readValue(request.getInputStream(), ApiUser.class);
             user = userDao.verify(user);
 
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    user.getId(), user.getPassword(), user.getAuthorities()));
+                    user.getId(), user.getPassword(), new ArrayList<>()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -55,7 +56,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request,
             HttpServletResponse response, FilterChain chain, Authentication authResult)
             throws IOException, ServletException {
-                User user = ((User)authResult.getPrincipal());
+                ApiUser user = ((ApiUser)authResult.getPrincipal());
                 String token = JWT.create().withSubject(user.getId().toString())
                 .withExpiresAt(new Date())
                 .sign(Algorithm.HMAC512(jwtConfig.getSecret()));

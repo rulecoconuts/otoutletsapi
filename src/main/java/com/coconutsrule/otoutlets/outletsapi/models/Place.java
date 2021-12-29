@@ -11,9 +11,10 @@ import org.geolatte.geom.Geometry;
  * It is a parent table so that all place locations can be queried regardless of their specific type.
  */
 @Data
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
-public class Place extends Auditable<User> {
+@DiscriminatorValue("Place")
+public abstract class Place extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PLACE_ID_SEQ")
     @SequenceGenerator(name = "PLACE_ID_SEQ", sequenceName = "PLACE_ID_SEQ", allocationSize = 10)

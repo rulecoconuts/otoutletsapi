@@ -3,6 +3,9 @@ package com.coconutsrule.otoutlets.outletsapi.models;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -14,7 +17,7 @@ import lombok.Data;
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @MappedSuperclass
-public abstract class Auditable<U> {
+public abstract class Auditable {
     @CreatedDate
     Instant creationDate;
 
@@ -22,8 +25,12 @@ public abstract class Auditable<U> {
     Instant lastModifiedDate;
 
     @CreatedBy
-    U createdBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "id")
+    ApiUser createdBy;
 
     @LastModifiedBy
-    U lastModifiedBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "id")
+    ApiUser lastModifiedBy;
 }

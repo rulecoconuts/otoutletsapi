@@ -8,6 +8,8 @@ services:
       - 8080:8080
     depends_on:
       - outletsapi-db
+    volumes:
+      - outletsapi-maven-files:/root/.m2
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://outletsapi-db:5432/outletsapi_db
       - SPRING_DATASOURCE_USERNAME=otoutlets
@@ -29,3 +31,4 @@ services:
       - POSTGRES_DB=outletsapi_db
 volumes:
   outletsapi-db-data:
+  outletsapi-maven-files:

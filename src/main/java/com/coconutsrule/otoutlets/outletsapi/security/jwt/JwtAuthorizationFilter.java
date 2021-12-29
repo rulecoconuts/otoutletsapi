@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.coconutsrule.otoutlets.outletsapi.dao.UserDao;
-import com.coconutsrule.otoutlets.outletsapi.models.User;
+import com.coconutsrule.otoutlets.outletsapi.models.ApiUser;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,11 +17,17 @@ import lombok.Data;
 
 @Data
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-    UserDao userDao;
-    JwtConfig jwtConfig;
+    private UserDao userDao;
+    private JwtConfig jwtConfig;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
+    }
+
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDao userDao, JwtConfig jwtConfig){
+        this(authenticationManager);
+        this.userDao = userDao;
+        this.jwtConfig = jwtConfig;
     }
 
     /**
@@ -55,7 +61,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     .build().verify(token).getSubject();
 
             if (userIdString != null) {
-                User user = userDao.findById(Integer.parseInt(userIdString));
+                ApiUser user = userDao.findById(Integer.parseInt(userIdString));
                 return new UsernamePasswordAuthenticationToken(user, null);
             }
         }
