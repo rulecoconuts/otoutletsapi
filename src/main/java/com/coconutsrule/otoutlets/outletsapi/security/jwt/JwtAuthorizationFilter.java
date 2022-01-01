@@ -24,7 +24,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         super(authenticationManager);
     }
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDao userDao, JwtConfig jwtConfig){
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDao userDao,
+            JwtConfig jwtConfig) {
         this(authenticationManager);
         this.userDao = userDao;
         this.jwtConfig = jwtConfig;
@@ -36,6 +37,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain chain) throws IOException, ServletException {
+        System.out.println("Order messed up");
         String header = request.getHeader(jwtConfig.getHeader());
         if (header == null || !header.startsWith(jwtConfig.getTokenPrefix())) {
             chain.doFilter(request, response);

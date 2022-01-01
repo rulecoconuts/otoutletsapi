@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Optional;
 import javax.sql.DataSource;
 import com.coconutsrule.otoutlets.outletsapi.dao.UserDao;
+import com.coconutsrule.otoutlets.outletsapi.security.jwt.DebugFilter;
 import com.coconutsrule.otoutlets.outletsapi.security.jwt.JwtAuthenticationFilter;
 import com.coconutsrule.otoutlets.outletsapi.security.jwt.JwtAuthorizationFilter;
 import com.coconutsrule.otoutlets.outletsapi.security.jwt.JwtConfig;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -34,9 +36,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.annotation.RequestScope;
 
-@Configuration
-@Order(1)
 @EnableWebSecurity
+@Order(1)
+@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -62,12 +64,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-        .authorizeRequests().antMatchers(HttpMethod.POST, "/register", "/register**").anonymous()
-        .and().addFilter(jwtAuthorizationFilter())
-                .authorizeRequests().anyRequest().authenticated().and()
-                .addFilter(jwtAuthenticationFilter()).antMatcher("/login")
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        // httpSecurity.addFilter(jwtAuthenticationFilter()).authorizeRequests()
+        // .antMatchers("/login**").permitAll().and().addFilter(jwtAuthorizationFilter())
+        // .authorizeRequests().anyRequest().authenticated().and().sessionManagement()
+        // .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        httpSecurity.antMatcher("/login**")
+                .httpBasic()
+                .authenticationEntryPoint(customBasicAuthenticationEntryPoint())
+                .and().csrf().disable().cors().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .addFilterBefore(new DebugFilter(), JwtAuthenticationFilter.class)
+                .addFilter(jwtAuthenticationFilter());
     }
 
     JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
@@ -106,5 +114,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/register**");
     }
 }

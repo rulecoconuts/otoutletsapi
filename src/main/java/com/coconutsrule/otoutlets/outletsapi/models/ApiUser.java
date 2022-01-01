@@ -1,5 +1,6 @@
 package com.coconutsrule.otoutlets.outletsapi.models;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import javax.persistence.Entity;
@@ -18,7 +19,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class ApiUser {
+public class ApiUser implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_ID_SEQ")
     @SequenceGenerator(name = "USER_ID_SEQ", sequenceName = "USER_ID_SEQ")
     @Id
