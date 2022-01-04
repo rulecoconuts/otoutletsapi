@@ -3,9 +3,11 @@
 sudo docker image build -t coconutsrule/outletsapi .;
 sudo docker push coconutsrule/outletsapi;
 sudo docker-compose down;
-# sudo docker rm outletsapi-db
+# sudo docker stop outletsapi
+# sudo docker stop outletsapi-db
 # sudo docker rm outletsapi
-# sudo docker volume remove blog_outletsapi-db-data
+# sudo docker rm outletsapi-db
+# sudo docker volume remove outletsapi_outletsapi-db-data
 sudo docker-compose pull;
 sudo docker-compose up -d;
 sudo docker logs -f outletsapi;

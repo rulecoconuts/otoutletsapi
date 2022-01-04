@@ -1,5 +1,6 @@
 package com.coconutsrule.otoutlets.outletsapi.security.jwt;
 
+import java.util.Date;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import lombok.Data;
@@ -42,7 +43,12 @@ public class JwtConfig {
             default:
                 break;
         }
+        System.out.println("");
 
         return milliseconds;
+    }
+
+    Date getNewExpirationDate(){
+        return new Date(System.currentTimeMillis()+getExpirationTimeInMilliseconds());
     }
 }

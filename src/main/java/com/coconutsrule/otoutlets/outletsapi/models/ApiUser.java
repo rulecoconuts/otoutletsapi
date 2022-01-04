@@ -1,8 +1,10 @@
 package com.coconutsrule.otoutlets.outletsapi.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -13,18 +15,21 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import com.coconutsrule.otoutlets.outletsapi.security.Permission;
 import com.coconutsrule.otoutlets.outletsapi.security.Role;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.Data;
 
 @Data
 @Entity
-public class ApiUser implements Serializable {
+@JsonDeserialize(using = ApiUserDeserializer.class)
+public class ApiUser {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_ID_SEQ")
     @SequenceGenerator(name = "USER_ID_SEQ", sequenceName = "USER_ID_SEQ")
     @Id
     Integer id;
 
+    @Column(unique = true)
     String username;
 
     // Password hash
@@ -38,6 +43,6 @@ public class ApiUser implements Serializable {
 
     Role role;
 
-    @OneToMany(mappedBy = "permissionId.user", fetch = FetchType.LAZY)
-	List<UserPermission> permissions;
+    @OneToMany(mappedBy = "permissionId.user", fetch = FetchType.EAGER)
+	List<UserPermission> permissions = new ArrayList<>();
 }

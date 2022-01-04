@@ -1,13 +1,13 @@
-package com.coconutsrule.otoutlets.outletsapi.security;
+package com.coconutsrule.otoutlets.outletsapi.security.jwt;
 
 import java.time.Instant;
 import java.util.Optional;
 import javax.sql.DataSource;
 import com.coconutsrule.otoutlets.outletsapi.dao.UserDao;
-import com.coconutsrule.otoutlets.outletsapi.security.jwt.DebugFilter;
-import com.coconutsrule.otoutlets.outletsapi.security.jwt.JwtAuthenticationFilter;
-import com.coconutsrule.otoutlets.outletsapi.security.jwt.JwtAuthorizationFilter;
-import com.coconutsrule.otoutlets.outletsapi.security.jwt.JwtConfig;
+import com.coconutsrule.otoutlets.outletsapi.security.ApiUserConverter;
+import com.coconutsrule.otoutlets.outletsapi.security.CustomAuditorAware;
+import com.coconutsrule.otoutlets.outletsapi.security.CustomBasicAuthenticationEntryPoint;
+import com.coconutsrule.otoutlets.outletsapi.security.PasswordStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +39,7 @@ import org.springframework.web.context.annotation.RequestScope;
 @EnableWebSecurity
 @Order(1)
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class JwtAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     @Qualifier("CustomUserDetailsService")
@@ -74,7 +74,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(customBasicAuthenticationEntryPoint())
                 .and().csrf().disable().cors().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .addFilterBefore(new DebugFilter(), JwtAuthenticationFilter.class)
                 .addFilter(jwtAuthenticationFilter());
     }
 
@@ -96,8 +95,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean("auditorAwareRef")
-    public AuditorAware<com.coconutsrule.otoutlets.outletsapi.models.ApiUser> auditorAware() {
-        return new CustomAuditorAware();
+    public AuditorAware<com.coconutsrule.otoutlets.outletsapi.models.ApiUser> auditorAware(ApiUserConverter apiUserConverter) {
+        return new CustomAuditorAware(apiUserConverter);
     }
 
     @Bean("dateTimeProviderRef")

@@ -7,8 +7,12 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class CustomAuditorAware implements AuditorAware<ApiUser> {
+    private final ApiUserConverter apiUserConverter;
+
     @Override
     public Optional<ApiUser> getCurrentAuditor() {
         SecurityContext context = SecurityContextHolder.getContext();

@@ -22,9 +22,11 @@ public class JwtAuthorizationConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.antMatcher("/**").addFilter(jwtAuthorizationFilter()).authorizeRequests().anyRequest()
-                .authenticated().and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);;
+        http.antMatcher("/**").authorizeRequests().anyRequest().authenticated().and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .csrf().disable().cors().disable()
+                .addFilterAfter(new DebugFilter(), JwtAuthorizationFilter.class)
+                .addFilter(jwtAuthorizationFilter());
     }
 
     JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {

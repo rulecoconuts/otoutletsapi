@@ -37,7 +37,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-        System.out.println("Order messed up");
         String header = request.getHeader(jwtConfig.getHeader());
         if (header == null || !header.startsWith(jwtConfig.getTokenPrefix())) {
             chain.doFilter(request, response);
@@ -57,7 +56,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
      * @return
      */
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(jwtConfig.getHeader());
+        String token = request.getHeader(jwtConfig.getHeader()).replace("Bearer ", "");
         if (token != null) {
             String userIdString = JWT.require(Algorithm.HMAC512(jwtConfig.getSecret().getBytes()))
                     .build().verify(token).getSubject();

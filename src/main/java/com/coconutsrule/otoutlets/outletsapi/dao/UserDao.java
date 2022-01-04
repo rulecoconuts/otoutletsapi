@@ -22,6 +22,7 @@ public class UserDao implements Dao<ApiUser, Integer> {
     @Override
     public ApiUser create(ApiUser entity) {
         entity.setSalt(generateSalt());
+        
         return userRepo.save(getUserWithHashedPassword(entity));
     }
 
@@ -49,11 +50,12 @@ public class UserDao implements Dao<ApiUser, Integer> {
      * @param user User with plaintext password
      * @return
      */
-    public ApiUser getUserWithHashedPassword(ApiUser user) {
-        String hash = passwordEncoder.encode(user.getPassword() + user.getSalt());
+    public ApiUser getUserWithHashedPassword(ApiUser user) {        
+        String hash = passwordEncoder.encode(user.getPassword());
         ApiUser encodedPasswordUser = new ApiUser();
         encodedPasswordUser.setUsername(user.getUsername());
         encodedPasswordUser.setPassword(hash);
+        encodedPasswordUser.setSalt(user.getSalt());
         return encodedPasswordUser;
     }
 
@@ -65,12 +67,12 @@ public class UserDao implements Dao<ApiUser, Integer> {
      */
     public ApiUser verify(ApiUser user) {
         ApiUser dbUser = findByUsername(user.getUsername());
+        
         if (dbUser == null)
             throw new UsernameNotFoundException("Username does not exist");
         user.setSalt(dbUser.getSalt());
-        ApiUser hashedUser = getUserWithHashedPassword(user);
-
-        if (!hashedUser.getPassword().equals(dbUser.getPassword()))
+        
+        if (!passwordEncoder.matches(user.getPassword(), dbUser.getPassword()))
             throw new BadCredentialsException("Invalid password");
 
         return dbUser;
@@ -85,12 +87,12 @@ public class UserDao implements Dao<ApiUser, Integer> {
 
     @Override
     public List<ApiUser> findAll() {
-        // TODO Auto-generated method stub
-        return null;
+        return userRepo.findAll();
     }
 
     public ApiUser findByUsername(String username) {
         return userRepo.findByUsername(username);
+        // return userRepo.findById(1).orElse(null);
     }
 
     @Override
@@ -113,8 +115,7 @@ public class UserDao implements Dao<ApiUser, Integer> {
 
     @Override
     public ApiUser findById(Integer id) {
-        // TODO Auto-generated method stub
-        return null;
+        return userRepo.findById(id).orElse(null);
     }
 
 }
