@@ -82,7 +82,7 @@ public class JwtAuthenticationConfig extends WebSecurityConfigurerAdapter {
     }
 
     JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
-        return new JwtAuthorizationFilter(authenticationManager(), userDao, jwtConfig);
+        return new JwtAuthorizationFilter(authenticationManager(), userDao, jwtConfig, userDetailsService);
     }
 
     BasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint() {

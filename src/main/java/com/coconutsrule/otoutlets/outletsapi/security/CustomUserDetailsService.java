@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return details;
     }
 
-    private Collection<? extends GrantedAuthority> buildAuthorities(ApiUser user) {
+    public Collection<? extends GrantedAuthority> buildAuthorities(ApiUser user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         if(user.getRole() == null){
             user.setRole(Role.USER);

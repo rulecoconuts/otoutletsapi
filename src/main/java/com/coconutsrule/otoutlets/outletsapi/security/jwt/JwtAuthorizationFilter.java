@@ -9,9 +9,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.coconutsrule.otoutlets.outletsapi.dao.UserDao;
 import com.coconutsrule.otoutlets.outletsapi.models.ApiUser;
+import com.coconutsrule.otoutlets.outletsapi.security.CustomUserDetailsService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import lombok.Data;
 
@@ -19,16 +21,18 @@ import lombok.Data;
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private UserDao userDao;
     private JwtConfig jwtConfig;
+    private UserDetailsService userDetailsService;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
     }
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDao userDao,
-            JwtConfig jwtConfig) {
+            JwtConfig jwtConfig, UserDetailsService userDetailsService) {
         this(authenticationManager);
         this.userDao = userDao;
         this.jwtConfig = jwtConfig;
+        this.userDetailsService = userDetailsService;
     }
 
     /**
@@ -46,6 +50,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         chain.doFilter(request, response);
     }
 
@@ -63,7 +68,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
             if (userIdString != null) {
                 ApiUser user = userDao.findById(Integer.parseInt(userIdString));
-                return new UsernamePasswordAuthenticationToken(user, null);
+                
+                return new UsernamePasswordAuthenticationToken(user, null,
+                        ((CustomUserDetailsService) userDetailsService).buildAuthorities(user));
             }
         }
 
