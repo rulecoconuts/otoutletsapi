@@ -8,8 +8,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.SequenceGenerator;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.geolatte.geom.C3D;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.codec.Wkt;
+import org.geolatte.geom.json.GeometryDeserializer;
+import org.geolatte.geom.json.GeometrySerializer;
 import lombok.Data;
 
 /**
@@ -24,6 +29,10 @@ public class Item extends Auditable{
     @SequenceGenerator(name = "ITEM_ID_SEQ", sequenceName = "ITEM_ID_SEQ", allocationSize = 10)
     Integer id;
 
+    String name;
+
+    @JsonSerialize(using = GeometrySerializer.class)
+    @JsonDeserialize(contentUsing = GeometryDeserializer.class)
     @Column(nullable = false)
-    Point<C3D> location;
+    Point<C3D> location = (Point)Wkt.fromWkt("POINT Z(0 0 0)");
 }
