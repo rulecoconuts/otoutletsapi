@@ -11,7 +11,9 @@ import lombok.Data;
 @Entity
 @DiscriminatorValue("outlet")
 public class Outlet extends Item {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_ID_SEQ")
-    Integer id;
+    // @Id
+    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_ID_SEQ")
+    // private Integer id;
+
+    String comment;
 }

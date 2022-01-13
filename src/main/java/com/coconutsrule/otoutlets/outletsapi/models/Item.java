@@ -1,5 +1,6 @@
 package com.coconutsrule.otoutlets.outletsapi.models;
 
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -23,16 +24,14 @@ import lombok.Data;
 @Data
 @Inheritance
 @Entity
-public class Item extends Auditable{
+public abstract class Item extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_ID_SEQ")
     @SequenceGenerator(name = "ITEM_ID_SEQ", sequenceName = "ITEM_ID_SEQ", allocationSize = 10)
-    Integer id;
+    private Integer id;
 
     String name;
 
-    @JsonSerialize(using = GeometrySerializer.class)
-    @JsonDeserialize(contentUsing = GeometryDeserializer.class)
     @Column(nullable = false)
     Point<C3D> location = (Point)Wkt.fromWkt("POINT Z(0 0 0)");
 }

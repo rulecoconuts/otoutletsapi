@@ -1,5 +1,6 @@
 package com.coconutsrule.otoutlets.outletsapi.models;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import javax.persistence.EntityListeners;
@@ -17,7 +18,7 @@ import lombok.Data;
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @MappedSuperclass
-public abstract class Auditable {
+public abstract class Auditable implements Serializable {
     @CreatedDate
     Instant creationDate;
 
