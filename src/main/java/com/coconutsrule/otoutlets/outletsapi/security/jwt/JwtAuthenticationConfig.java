@@ -35,6 +35,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @EnableWebSecurity
 @Order(1)
@@ -50,6 +51,10 @@ public class JwtAuthenticationConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     JwtConfig jwtConfig;
+
+    @Autowired
+    @Qualifier("corsConfigSourceMain")
+    CorsConfigurationSource corsConfigurationSource;
 
     @Autowired
     UserDetailsManager users(DataSource dataSource) {
@@ -72,7 +77,7 @@ public class JwtAuthenticationConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.antMatcher("/login**")
                 .httpBasic()
                 .authenticationEntryPoint(customBasicAuthenticationEntryPoint())
-                .and().csrf().disable().cors().disable()
+                .and().csrf().disable().cors().configurationSource(corsConfigurationSource).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .addFilter(jwtAuthenticationFilter());
     }

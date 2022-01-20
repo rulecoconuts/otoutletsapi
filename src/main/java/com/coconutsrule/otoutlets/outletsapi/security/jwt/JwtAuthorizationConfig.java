@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Order(2)
 @Configuration
@@ -26,16 +27,21 @@ public class JwtAuthorizationConfig extends WebSecurityConfigurerAdapter {
     @Qualifier("CustomUserDetailsService")
     UserDetailsService userDetailsService;
 
+    @Autowired
+    @Qualifier("corsConfigSourceMain")
+    CorsConfigurationSource corsConfigurationSource;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.antMatcher("/**").authorizeRequests().anyRequest().authenticated().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .csrf().disable().cors().disable()
+                .csrf().disable().cors().configurationSource(corsConfigurationSource).and()
                 .addFilter(jwtAuthorizationFilter());
     }
 
     JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
-        return new JwtAuthorizationFilter(authenticationManager(), userDao, jwtConfig, userDetailsService);
+        return new JwtAuthorizationFilter(authenticationManager(), userDao, jwtConfig,
+                userDetailsService);
     }
 
     BasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint() {
